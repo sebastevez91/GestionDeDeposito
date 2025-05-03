@@ -11,6 +11,7 @@ namespace GestionDeDeposito.Controllers
         public IActionResult Login([FromBody] LoginRequest request)
         {
             // Lógica de autenticación va acá
+            // TODO
             return Ok();
         }
     }
