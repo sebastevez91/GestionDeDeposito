@@ -1,4 +1,5 @@
-﻿using GestionDeDeposito.Models;
+﻿using BCrypt.Net;
+using GestionDeDeposito.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -21,32 +22,40 @@ namespace GestionDeDeposito.Controllers
         [HttpPost("login")]
         public IActionResult Login([FromBody] LoginRequest request)
         {
-            // Validación de usuario simulada (deberías reemplazar con tu base de datos)
-            if (request.Username == "admin" && request.Password == "admin123")
+            // Simulación reemplazar con base de datos
+            var users = new List<Users>
             {
-                // Generar token JWT
-                var tokenHandler = new JwtSecurityTokenHandler();
-                var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]);
+                new Users { Username = "admin", HashedPassword = BCrypt.Net.BCrypt.HashPassword("admin123") },
+                new Users { Username = "operario", HashedPassword = BCrypt.Net.BCrypt.HashPassword("operario123") }
+            };
 
-                var tokenDescriptor = new SecurityTokenDescriptor
-                {
-                    Subject = new ClaimsIdentity(new[]
+            var user = users.FirstOrDefault(u => u.Username == request.Username);
+
+            if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.HashedPassword))
+            {
+                return Unauthorized(new { message = "Credenciales inválidas" });
+            }
+
+            // Generar token JWT
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]);
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new[]
                     {
                         new Claim(ClaimTypes.Name, request.Username)
                     }),
-                    Expires = DateTime.UtcNow.AddHours(1),
-                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
-                    Issuer = _configuration["Jwt:Issuer"],
-                    Audience = _configuration["Jwt:Audience"]
-                };
+                Expires = DateTime.UtcNow.AddHours(1),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
+                Issuer = _configuration["Jwt:Issuer"],
+                Audience = _configuration["Jwt:Audience"]
+            };
 
-                var token = tokenHandler.CreateToken(tokenDescriptor);
-                var jwt = tokenHandler.WriteToken(token);
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            var jwt = tokenHandler.WriteToken(token);
 
-                return Ok(new { token = jwt });
-            }
-
-            return Unauthorized(new { message = "Credenciales inválidas" });
+            return Ok(new { token = jwt });
         }
     }
 }
