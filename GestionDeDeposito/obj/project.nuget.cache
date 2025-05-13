@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "+4EgKfcGUIGFtCATcPuTE/rb9Zl/nVNYFicuujAtEiAYkKOaK24LixGMC28m3l7oaIc9tsEdXk72ROBGZHKisg==",
+  "dgSpecHash": "NcUmItjkNFG6hjD19net+NDAm04yvKeQN5ErvzHtMgDS1NcD3/pu4O4Io3shxeinjxxFfXKvAiejZdYJXIoehg==",
   "success": true,
   "projectFilePath": "C:\\Users\\Sebastian\\Desktop\\PP5\\SGD\\GestionDeDeposito\\GestionDeDeposito\\GestionDeDeposito.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\Sebastian\\.nuget\\packages\\bcrypt.net-next\\4.0.3\\bcrypt.net-next.4.0.3.nupkg.sha512",
     "C:\\Users\\Sebastian\\.nuget\\packages\\microsoft.aspnetcore.authentication.jwtbearer\\8.0.4\\microsoft.aspnetcore.authentication.jwtbearer.8.0.4.nupkg.sha512",
     "C:\\Users\\Sebastian\\.nuget\\packages\\microsoft.identitymodel.abstractions\\7.1.2\\microsoft.identitymodel.abstractions.7.1.2.nupkg.sha512",
     "C:\\Users\\Sebastian\\.nuget\\packages\\microsoft.identitymodel.jsonwebtokens\\7.1.2\\microsoft.identitymodel.jsonwebtokens.7.1.2.nupkg.sha512",
