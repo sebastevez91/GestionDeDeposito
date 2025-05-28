@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Gestión de Depósito (Prototipo)</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Sistema de Gestión de Depósito</h1>
+        <div class="user-info">
+            <span>Usuario: Operario Demo</span> | <a href="#" id="logout-link">Cerrar Sesión</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <aside class="sidebar">
+            <h2>Navegación</h2>
+            <nav>
+                <ul>
+                    <li><a href="#" data-page="dashboard">Dashboard</a></li>
+                    <li><a href="#" data-page="productos-lista">Gestión de Productos</a></li>
+                    <li><a href="#" data-page="productos-form">Nuevo Producto</a></li>
+                    <li><a href="#" data-page="stock-movimiento">Registrar Movimiento</a></li>
+                    <li><a href="#" data-page="movimientos-consulta">Consultar Movimientos</a></li>
+                    <li><a href="#" data-page="usuarios-lista">Gestión de Usuarios (Admin)</a></li>
+                    <li><a href="#" data-page="usuarios-form">Nuevo Usuario (Admin)</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="page-section active">
+                <h2>Dashboard Principal</h2>
+                <p>Bienvenido al Sistema de Gestión de Depósito.</p>
+                <div class="stats-cards">
+                    <div class="card">
+                        <h3>Productos Totales</h3>
+                        <p>125</p>
+                    </div>
+                    <div class="card">
+                        <h3>Stock Bajo</h3>
+                        <p>15</p>
+                    </div>
+                    <div class="card">
+                        <h3>Movimientos Hoy</h3>
+                        <p>32</p>
+                    </div>
+                </div>
+                <p>Aquí se mostrarán resúmenes, alertas importantes y accesos directos.</p>
+            </section>
+
+            <!-- Gestión de Productos (Lista) -->
+            <section id="productos-lista" class="page-section">
+                <h2>Listado de Productos</h2>
+                <div class="actions-bar">
+                    <input type="text" placeholder="Buscar por código o nombre...">
+                    <button class="btn btn-primary" onclick="navigateTo('productos-form')">Nuevo Producto</button>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Nombre</th>
+                            <th>Descripción</th>
+                            <th>Stock Actual</th>
+                            <th>Unidad</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>PROD-001</td>
+                            <td>Tornillos Phillips 1/2"</td>
+                            <td>Caja x100 unidades</td>
+                            <td>50</td>
+                            <td>Caja</td>
+                            <td><button class="btn btn-sm">Editar</button> <button class="btn btn-sm btn-danger">Inactivar</button></td>
+                        </tr>
+                        <tr>
+                            <td>PROD-002</td>
+                            <td>Arandelas Planas M6</td>
+                            <td>Bolsa x200 unidades</td>
+                            <td>120</td>
+                            <td>Bolsa</td>
+                            <td><button class="btn btn-sm">Editar</button> <button class="btn btn-sm btn-danger">Inactivar</button></td>
+                        </tr>
+                        <tr>
+                            <td>PROD-003</td>
+                            <td>Martillo de Uña</td>
+                            <td>Mango de madera, 16oz</td>
+                            <td>15</td>
+                            <td>Unidad</td>
+                            <td><button class="btn btn-sm">Editar</button> <button class="btn btn-sm btn-danger">Inactivar</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- Gestión de Productos (Formulario Alta/Modificación) -->
+            <section id="productos-form" class="page-section">
+                <h2>Nuevo Producto / Editar Producto</h2>
+                <form id="form-producto">
+                    <div>
+                        <label for="prod-codigo">Código:</label>
+                        <input type="text" id="prod-codigo" name="codigo" required>
+                    </div>
+                    <div>
+                        <label for="prod-nombre">Nombre:</label>
+                        <input type="text" id="prod-nombre" name="nombre" required>
+                    </div>
+                    <div>
+                        <label for="prod-descripcion">Descripción:</label>
+                        <textarea id="prod-descripcion" name="descripcion"></textarea>
+                    </div>
+                    <div>
+                        <label for="prod-unidad">Unidad de Medida:</label>
+                        <input type="text" id="prod-unidad" name="unidad" required>
+                    </div>
+                    <div>
+                        <label for="prod-stock-inicial">Stock Inicial:</label>
+                        <input type="number" id="prod-stock-inicial" name="stock" min="0" value="0" required>
+                    </div>
+                    <button type="submit" class="btn btn-success">Guardar Producto</button>
+                    <button type="button" class="btn" onclick="navigateTo('productos-lista')">Cancelar</button>
+                </form>
+            </section>
+
+            <!-- Gestión de Stock (Formulario Registro de Movimiento) -->
+            <section id="stock-movimiento" class="page-section">
+                <h2>Registrar Movimiento de Stock</h2>
+                <form id="form-movimiento">
+                    <div>
+                        <label for="mov-producto">Producto (Código o Nombre):</label>
+                        <input type="text" id="mov-producto" name="producto" placeholder="Buscar producto..." required>
+                        <!-- En un sistema real, esto sería un autocompletar o selector -->
+                    </div>
+                    <div>
+                        <label for="mov-tipo">Tipo de Movimiento:</label>
+                        <select id="mov-tipo" name="tipo" required>
+                            <option value="entrada">Entrada</option>
+                            <option value="salida">Salida</option>
+                            <option value="ajuste">Ajuste</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="mov-cantidad">Cantidad:</label>
+                        <input type="number" id="mov-cantidad" name="cantidad" min="1" required>
+                    </div>
+                    <div>
+                        <label for="mov-justificacion">Justificación (para Ajuste/Baja):</label>
+                        <textarea id="mov-justificacion" name="justificacion"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-success">Registrar Movimiento</button>
+                </form>
+            </section>
+
+            <!-- Consulta de Movimientos -->
+            <section id="movimientos-consulta" class="page-section">
+                <h2>Consulta de Movimientos de Inventario</h2>
+                <div class="filters-bar">
+                    <input type="text" placeholder="Filtrar por Producto...">
+                    <input type="date" placeholder="Fecha Desde">
+                    <input type="date" placeholder="Fecha Hasta">
+                    <select>
+                        <option value="">Todos los Tipos</option>
+                        <option value="entrada">Entrada</option>
+                        <option value="salida">Salida</option>
+                        <option value="ajuste">Ajuste</option>
+                    </select>
+                    <button class="btn">Filtrar</button>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Fecha/Hora</th>
+                            <th>Producto</th>
+                            <th>Tipo</th>
+                            <th>Cantidad</th>
+                            <th>Usuario</th>
+                            <th>Justificación</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>2024-07-26 10:30</td>
+                            <td>PROD-001</td>
+                            <td>Entrada</td>
+                            <td>20</td>
+                            <td>Operario01</td>
+                            <td>Pedido Compra #123</td>
+                        </tr>
+                        <tr>
+                            <td>2024-07-26 11:15</td>
+                            <td>PROD-002</td>
+                            <td>Salida</td>
+                            <td>5</td>
+                            <td>Operario01</td>
+                            <td>Venta #456</td>
+                        </tr>
+                         <tr>
+                            <td>2024-07-25 09:00</td>
+                            <td>PROD-003</td>
+                            <td>Ajuste</td>
+                            <td>-1</td>
+                            <td>Admin01</td>
+                            <td>Rotura detectada</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+             <!-- Gestión de Usuarios (Lista - Admin) -->
+             <section id="usuarios-lista" class="page-section">
+                <h2>Gestión de Usuarios (Administrador)</h2>
+                 <div class="actions-bar">
+                    <input type="text" placeholder="Buscar por nombre de usuario...">
+                    <button class="btn btn-primary" onclick="navigateTo('usuarios-form')">Nuevo Usuario</button>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nombre de Usuario</th>
+                            <th>Nombre Completo</th>
+                            <th>Rol</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>operario01</td>
+                            <td>Juan Pérez</td>
+                            <td>Operario Depósito</td>
+                            <td>Activo</td>
+                            <td><button class="btn btn-sm">Editar</button> <button class="btn btn-sm btn-danger">Desactivar</button></td>
+                        </tr>
+                        <tr>
+                            <td>admin01</td>
+                            <td>Ana Gómez</td>
+                            <td>Administrador</td>
+                            <td>Activo</td>
+                            <td><button class="btn btn-sm">Editar</button></td>
+                        </tr>
+                         <tr>
+                            <td>operario02</td>
+                            <td>Maria López</td>
+                            <td>Operario Depósito</td>
+                            <td>Inactivo</td>
+                            <td><button class="btn btn-sm">Editar</button> <button class="btn btn-sm btn-success">Activar</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- Gestión de Usuarios (Formulario Alta/Modificación - Admin) -->
+            <section id="usuarios-form" class="page-section">
+                <h2>Nuevo Usuario / Editar Usuario (Administrador)</h2>
+                <form id="form-usuario">
+                    <div>
+                        <label for="user-username">Nombre de Usuario:</label>
+                        <input type="text" id="user-username" name="username" required>
+                    </div>
+                    <div>
+                        <label for="user-fullname">Nombre Completo:</label>
+                        <input type="text" id="user-fullname" name="fullname" required>
+                    </div>
+                    <div>
+                        <label for="user-password">Contraseña:</label>
+                        <input type="password" id="user-password" name="password">
+                        <small>Dejar en blanco para no cambiar en edición.</small>
+                    </div>
+                     <div>
+                        <label for="user-role">Rol:</label>
+                        <select id="user-role" name="role" required>
+                            <option value="operario">Operario Depósito</option>
+                            <option value="admin">Administrador</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="user-status">Estado:</label>
+                        <select id="user-status" name="status" required>
+                            <option value="activo">Activo</option>
+                            <option value="inactivo">Inactivo</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-success">Guardar Usuario</button>
+                    <button type="button" class="btn" onclick="navigateTo('usuarios-lista')">Cancelar</button>
+                </form>
+            </section>
+
+        </main>
+    </div>
+
+    <footer>
+        <p>© 2024 Equipo SGD (Benjamín GONZÁLEZ, Lucas PÉREZ, Sebastián TEVEZ) - Prototipo</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
