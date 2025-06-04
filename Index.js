@@ -1,32 +1,46 @@
 const express = require('express');
+const path = require('path');
 const pool = require('./db');
+const loginRouter = require('./login');
+const { verificarToken } = require('./auth');
+
 const app = express();
 const PORT = 3000;
 
 app.use(express.json());
+app.use(express.static(path.join(__dirname,)));
 
-// Simulación de login (ej: usuario ID = 1)
-app.use(async (req, res, next) => {
-  const conn = await pool.getConnection();
-  await conn.query('SET @usuario_actual = ?', [1]); // Simular ID usuario
-  req.conn = conn;
-  next();
+// Ruta raíz para servir index.html
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// Ruta para guardar producto
-app.post('/api/productos', async (req, res) => {
-  const { codigo, nombre, descripcion, unidad, stock } = req.body;
+// Login
+app.use('/api', loginRouter);
 
+// Endpoint protegido: crear producto
+app.post('/api/productos', verificarToken, async (req, res) => {
+  const { codigo, nombre, descripcion, stock } = req.body;
+  const usuario_id = req.usuario.id; // extraído del token
+
+  const conn = await pool.getConnection();
   try {
-    const [result] = await req.conn.query(
+    // Insertar producto
+    const [result] = await conn.query(
       'INSERT INTO Producto (codigo, nombre, descripcion) VALUES (?, ?, ?)',
       [codigo, nombre, descripcion]
     );
 
-    // Insertar en Inventario (depósito fijo por ahora: id 1)
-    await req.conn.query(
+    // Insertar en Inventario (depósito fijo por ahora)
+    await conn.query(
       'INSERT INTO Inventario (producto_id, deposito_id, stock) VALUES (?, ?, ?)',
       [result.insertId, 1, stock]
+    );
+
+    // Insertar auditoría
+    await conn.query(
+      'INSERT INTO Auditoria (tabla, id_registro, accion, usuario_id, datos_nuevos) VALUES (?, ?, ?, ?, ?)',
+      ['Producto', result.insertId, 'INSERT', usuario_id, JSON.stringify({ codigo, nombre, descripcion, stock })]
     );
 
     res.status(201).json({ mensaje: 'Producto creado con éxito ✅' });
@@ -34,7 +48,7 @@ app.post('/api/productos', async (req, res) => {
     console.error(err);
     res.status(500).json({ error: 'Error al guardar producto ❌' });
   } finally {
-    req.conn.release();
+    conn.release();
   }
 });
 
