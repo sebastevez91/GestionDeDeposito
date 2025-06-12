@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from '../Api/axios';
+import api from '../Api/axios';
 import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
@@ -12,9 +12,18 @@ const Login = () => {
     e.preventDefault();
 
     try {
-      const res = await axios.post('/login', { usuario, password });
-      localStorage.setItem('token', res.data.token); // Guardamos el token
-      navigate('/dashboard'); // Redirigimos al Dashboard
+      const res = await api.post('/login', { usuario, password });
+
+      // Guardar el token en localStorage
+      localStorage.setItem('token', res.data.token);
+
+      // Limpiar campos y errores
+      setUsuario('');
+      setPassword('');
+      setError('');
+
+      // Redirigir
+      navigate('/dashboard');
     } catch (err) {
       setError(err.response?.data?.error || 'Error al iniciar sesión');
     }

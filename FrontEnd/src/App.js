@@ -4,8 +4,8 @@ import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import Footer from './components/Footer';
 import Dashboard from './components/Dashboard';
-import ProductosLista from './components/ProductosLista';
-import ProductosForm from './components/ProductosForm';
+import ProductosLista from './components/ProductoLista';
+import ProductosForm from './components/ProductoForm';
 import StockMovimiento from './components/StockMovimiento';
 import MovimientosConsulta from './components/MovimientosConsulta';
 import UsuariosLista from './components/UsuariosLista';
@@ -15,11 +15,9 @@ import PrivateRoute from './utils/PrivateRoute';
 import './App.css';
 
 function App() {
-  // Mantener estados para pasar datos de edición
   const [editingProducto, setEditingProducto] = useState(null);
   const [editingUsuario, setEditingUsuario] = useState(null);
 
-  // Funciones para setear el item a editar
   const handleEditProducto = (producto) => setEditingProducto(producto);
   const handleEditUsuario = (usuario) => setEditingUsuario(usuario);
 
@@ -28,7 +26,7 @@ function App() {
       <Header />
       <div className="container" style={{ display: 'flex' }}>
         <Sidebar />
-        <main className="main-content" style={{ flex: 1 }}>
+        <main className="main-content" style={{ flex: 1, padding: '1rem' }}>
           <Routes>
             <Route path="/" element={<Login />} />
 
@@ -109,7 +107,7 @@ function App() {
               }
             />
 
-            {/* Redireccionar rutas desconocidas */}
+            {/* Redirección para rutas desconocidas */}
             <Route path="*" element={<Navigate to="/dashboard" />} />
           </Routes>
         </main>

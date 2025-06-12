@@ -322,3 +322,26 @@ footer {
     }
 
 }
+
+/*TONY*/
+
+.sidebar-button {
+  display: block;
+  width: 100%;
+  padding: 10px 15px;
+  margin: 5px 0;
+  color: #fff;
+  background-color: #2c3e50; /* un azul oscuro que combina */
+  border: none;
+  text-align: left;
+  font-size: 16px;
+  border-radius: 5px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  text-decoration: none; /* si usas <a> en vez de <button> */
+}
+
+.sidebar-button:hover {
+  background-color: #34495e; /* un tono un poco más claro al pasar el mouse */
+  transform: translateX(5px); /* pequeño efecto de movimiento */
+  cursor: pointer;
+}

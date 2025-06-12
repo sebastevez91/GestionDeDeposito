@@ -12,13 +12,13 @@ const Sidebar = ({ navigateTo }) => {
   ];
 
   return (
-    <aside className="sidebar">
+    <aside className="sidebar sidebar-button">
       <h2>Navegación</h2>
       <nav>
         <ul>
           {pages.map(({ id, label }) => (
             <li key={id}>
-              <button className="link-button" onClick={() => navigateTo(id)}>
+              <button className="link-button  sidebar-button" onClick={() => navigateTo(id)}>
                 {label}
               </button>
             </li>
