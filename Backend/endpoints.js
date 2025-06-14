@@ -1,11 +1,9 @@
-// endpoints.js - CRUD con auditoría para Producto, Deposito, Inventario y Usuario
-
 const express = require('express');
 const router = express.Router();
-const pool = require('./db');
+const { sql, poolPromise } = require('./db');
 const { registrarAuditoria } = require('./auditoria');
 
-// ⚠️ Simulación de login temporal (reemplazar por auth real)
+// ⚠️ Simulación de login temporal
 const usuario_id = 1;
 
 //---------------------------------------------
@@ -13,68 +11,80 @@ const usuario_id = 1;
 //---------------------------------------------
 router.post('/productos', async (req, res) => {
   const { codigo, nombre, descripcion } = req.body;
-  const conn = await pool.getConnection();
   try {
-    const [result] = await conn.query(
-      'INSERT INTO Producto (codigo, nombre, descripcion) VALUES (?, ?, ?)',
-      [codigo, nombre, descripcion]
-    );
+    const pool = await poolPromise;
+    const result = await pool.request()
+      .input('codigo', sql.VarChar, codigo)
+      .input('nombre', sql.VarChar, nombre)
+      .input('descripcion', sql.VarChar, descripcion)
+      .query('INSERT INTO Producto (codigo, nombre, descripcion) OUTPUT INSERTED.id VALUES (@codigo, @nombre, @descripcion)');
+    
+    const id = result.recordset[0].id;
+
     await registrarAuditoria({
       tabla: 'Producto',
-      id_registro: result.insertId,
+      id_registro: id,
       accion: 'INSERT',
       usuario_id,
       datos_nuevos: { codigo, nombre, descripcion }
     });
+
     res.status(201).json({ mensaje: 'Producto creado ✅' });
   } catch (err) {
     res.status(500).json({ error: err.message });
-  } finally {
-    conn.release();
   }
 });
 
 router.put('/productos/:id', async (req, res) => {
   const { codigo, nombre, descripcion } = req.body;
   const { id } = req.params;
-  const conn = await pool.getConnection();
   try {
-    const [oldData] = await conn.query('SELECT * FROM Producto WHERE id = ?', [id]);
-    await conn.query('UPDATE Producto SET codigo=?, nombre=?, descripcion=? WHERE id=?', [codigo, nombre, descripcion, id]);
+    const pool = await poolPromise;
+    const oldDataResult = await pool.request().input('id', sql.Int, id).query('SELECT * FROM Producto WHERE id = @id');
+    const oldData = oldDataResult.recordset[0];
+
+    await pool.request()
+      .input('id', sql.Int, id)
+      .input('codigo', sql.VarChar, codigo)
+      .input('nombre', sql.VarChar, nombre)
+      .input('descripcion', sql.VarChar, descripcion)
+      .query('UPDATE Producto SET codigo=@codigo, nombre=@nombre, descripcion=@descripcion WHERE id=@id');
+
     await registrarAuditoria({
       tabla: 'Producto',
       id_registro: id,
       accion: 'UPDATE',
       usuario_id,
-      datos_anteriores: oldData[0],
+      datos_anteriores: oldData,
       datos_nuevos: { codigo, nombre, descripcion }
     });
+
     res.json({ mensaje: 'Producto actualizado ✅' });
   } catch (err) {
     res.status(500).json({ error: err.message });
-  } finally {
-    conn.release();
   }
 });
 
 router.delete('/productos/:id', async (req, res) => {
   const { id } = req.params;
-  const conn = await pool.getConnection();
   try {
-    const [oldData] = await conn.query('SELECT * FROM Producto WHERE id = ?', [id]);
-    await conn.query('DELETE FROM Producto WHERE id = ?', [id]);
+    const pool = await poolPromise;
+    const oldDataResult = await pool.request().input('id', sql.Int, id).query('SELECT * FROM Producto WHERE id = @id');
+    const oldData = oldDataResult.recordset[0];
+
+    await pool.request().input('id', sql.Int, id).query('DELETE FROM Producto WHERE id = @id');
+
     await registrarAuditoria({
       tabla: 'Producto',
       id_registro: id,
       accion: 'DELETE',
       usuario_id,
-      datos_anteriores: oldData[0]
+      datos_anteriores: oldData
     });
+
     res.json({ mensaje: 'Producto eliminado ✅' });
   } catch (err) {
     res.status(500).json({ error: err.message });
-  } finally {
-    conn.release();
   }
 });
 
@@ -83,15 +93,26 @@ router.delete('/productos/:id', async (req, res) => {
 //---------------------------------------------
 router.post('/depositos', async (req, res) => {
   const { nombre, ubicacion } = req.body;
-  const conn = await pool.getConnection();
   try {
-    const [result] = await conn.query('INSERT INTO Deposito (nombre, ubicacion) VALUES (?, ?)', [nombre, ubicacion]);
-    await registrarAuditoria({ tabla: 'Deposito', id_registro: result.insertId, accion: 'INSERT', usuario_id, datos_nuevos: { nombre, ubicacion } });
+    const pool = await poolPromise;
+    const result = await pool.request()
+      .input('nombre', sql.VarChar, nombre)
+      .input('ubicacion', sql.VarChar, ubicacion)
+      .query('INSERT INTO Deposito (nombre, ubicacion) OUTPUT INSERTED.id VALUES (@nombre, @ubicacion)');
+
+    const id = result.recordset[0].id;
+
+    await registrarAuditoria({
+      tabla: 'Deposito',
+      id_registro: id,
+      accion: 'INSERT',
+      usuario_id,
+      datos_nuevos: { nombre, ubicacion }
+    });
+
     res.status(201).json({ mensaje: 'Depósito creado ✅' });
   } catch (err) {
     res.status(500).json({ error: err.message });
-  } finally {
-    conn.release();
   }
 });
 
@@ -100,15 +121,27 @@ router.post('/depositos', async (req, res) => {
 //---------------------------------------------
 router.post('/inventario', async (req, res) => {
   const { producto_id, deposito_id, stock } = req.body;
-  const conn = await pool.getConnection();
   try {
-    const [result] = await conn.query('INSERT INTO Inventario (producto_id, deposito_id, stock) VALUES (?, ?, ?)', [producto_id, deposito_id, stock]);
-    await registrarAuditoria({ tabla: 'Inventario', id_registro: result.insertId, accion: 'INSERT', usuario_id, datos_nuevos: { producto_id, deposito_id, stock } });
+    const pool = await poolPromise;
+    const result = await pool.request()
+      .input('producto_id', sql.Int, producto_id)
+      .input('deposito_id', sql.Int, deposito_id)
+      .input('stock', sql.Int, stock)
+      .query('INSERT INTO Inventario (producto_id, deposito_id, stock) OUTPUT INSERTED.id VALUES (@producto_id, @deposito_id, @stock)');
+
+    const id = result.recordset[0].id;
+
+    await registrarAuditoria({
+      tabla: 'Inventario',
+      id_registro: id,
+      accion: 'INSERT',
+      usuario_id,
+      datos_nuevos: { producto_id, deposito_id, stock }
+    });
+
     res.status(201).json({ mensaje: 'Stock agregado ✅' });
   } catch (err) {
     res.status(500).json({ error: err.message });
-  } finally {
-    conn.release();
   }
 });
 
@@ -117,24 +150,31 @@ router.post('/inventario', async (req, res) => {
 //---------------------------------------------
 router.post('/usuarios', async (req, res) => {
   const { nombre_usuario, email, password, rol_id, deposito_id } = req.body;
-  const conn = await pool.getConnection();
   try {
-    const [result] = await conn.query(
-      'INSERT INTO Usuario (nombre_usuario, email, password, rol_id, deposito_id) VALUES (?, ?, ?, ?, ?)',
-      [nombre_usuario, email, password, rol_id, deposito_id]
-    );
+    const pool = await poolPromise;
+    const result = await pool.request()
+      .input('nombre_usuario', sql.VarChar, nombre_usuario)
+      .input('email', sql.VarChar, email)
+      .input('password', sql.VarChar, password)
+      .input('rol_id', sql.Int, rol_id)
+      .input('deposito_id', sql.Int, deposito_id)
+      .query(`INSERT INTO Usuario (nombre_usuario, email, password, rol_id, deposito_id)
+              OUTPUT INSERTED.id
+              VALUES (@nombre_usuario, @email, @password, @rol_id, @deposito_id)`);
+
+    const id = result.recordset[0].id;
+
     await registrarAuditoria({
       tabla: 'Usuario',
-      id_registro: result.insertId,
+      id_registro: id,
       accion: 'INSERT',
       usuario_id,
       datos_nuevos: { nombre_usuario, email, rol_id, deposito_id }
     });
+
     res.status(201).json({ mensaje: 'Usuario creado ✅' });
   } catch (err) {
     res.status(500).json({ error: err.message });
-  } finally {
-    conn.release();
   }
 });
 
