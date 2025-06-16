@@ -2,9 +2,38 @@ const express = require('express');
 const router = express.Router();
 const { sql, poolPromise } = require('./db');
 const { registrarAuditoria } = require('./auditoria');
+const { generarToken } = require('./auth');
 
 // ⚠️ Simulación de login temporal
 const usuario_id = 1;
+
+//---------------------------------------------
+// LOGIN
+//---------------------------------------------
+router.post('/login', async (req, res) => {
+  const { nombre_usuario, password } = req.body;
+  try {
+    const pool = await poolPromise;
+    const result = await pool.request()
+      .input('nombre_usuario', sql.VarChar, nombre_usuario)
+      .query('SELECT * FROM Usuario WHERE nombre_usuario = @nombre_usuario');
+
+    const usuario = result.recordset[0];
+
+    if (!usuario) {
+      return res.status(401).json({ error: 'Usuario no encontrado' });
+    }
+
+    if (usuario.password !== password) {
+      return res.status(401).json({ error: 'Contraseña incorrecta' });
+    }
+
+    const token = generarToken(usuario);
+    res.json({ mensaje: 'Login exitoso ✅', token, usuario: { id: usuario.id, nombre_usuario: usuario.nombre_usuario } });
+  } catch (err) {
+    res.status(500).json({ error: 'Error en el servidor' });
+  }
+});
 
 //---------------------------------------------
 // PRODUCTO
