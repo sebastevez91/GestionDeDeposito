@@ -11,8 +11,8 @@ const PORT = process.env.PORT || 3001; // ✅ Usa puerto desde .env
 
 // CORS para permitir acceso desde el frontend
 app.use(cors({
-  origin: 'http://localhost:3000', // ⚠️ Debe coincidir con el frontend
-  credentials: false
+  origin: 'http://localhost:3000', // el frontend
+  credentials: true, // ✅ permite cookies, headers de auth, etc.
 }));
 
 app.use(express.json());

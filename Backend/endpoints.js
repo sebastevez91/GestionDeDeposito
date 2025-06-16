@@ -11,12 +11,12 @@ const usuario_id = 1;
 // LOGIN
 //---------------------------------------------
 router.post('/login', async (req, res) => {
-  const { nombre_usuario, password } = req.body;
+  const { username, password } = req.body;
   try {
     const pool = await poolPromise;
     const result = await pool.request()
-      .input('nombre_usuario', sql.VarChar, nombre_usuario)
-      .query('SELECT * FROM Usuario WHERE nombre_usuario = @nombre_usuario');
+      .input('username', sql.VarChar, username)
+      .query('SELECT * FROM Usuarios WHERE username = @username');
 
     const usuario = result.recordset[0];
 
@@ -29,7 +29,7 @@ router.post('/login', async (req, res) => {
     }
 
     const token = generarToken(usuario);
-    res.json({ mensaje: 'Login exitoso ✅', token, usuario: { id: usuario.id, nombre_usuario: usuario.nombre_usuario } });
+    res.json({ mensaje: 'Login exitoso ✅', token, usuario: { id: usuario.id, username: usuario.username, rol: usuario.rol } });
   } catch (err) {
     res.status(500).json({ error: 'Error en el servidor' });
   }
@@ -178,18 +178,18 @@ router.post('/inventario', async (req, res) => {
 // USUARIO
 //---------------------------------------------
 router.post('/usuarios', async (req, res) => {
-  const { nombre_usuario, email, password, rol_id, deposito_id } = req.body;
+  const { username, email, password, rol_id, deposito_id } = req.body;
   try {
     const pool = await poolPromise;
     const result = await pool.request()
-      .input('nombre_usuario', sql.VarChar, nombre_usuario)
+      .input('username', sql.VarChar, username)
       .input('email', sql.VarChar, email)
       .input('password', sql.VarChar, password)
       .input('rol_id', sql.Int, rol_id)
       .input('deposito_id', sql.Int, deposito_id)
-      .query(`INSERT INTO Usuario (nombre_usuario, email, password, rol_id, deposito_id)
+      .query(`INSERT INTO Usuario (username, email, password, rol_id, deposito_id)
               OUTPUT INSERTED.id
-              VALUES (@nombre_usuario, @email, @password, @rol_id, @deposito_id)`);
+              VALUES (@username, @email, @password, @rol_id, @deposito_id)`);
 
     const id = result.recordset[0].id;
 
