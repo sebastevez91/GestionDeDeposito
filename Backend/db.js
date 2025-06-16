@@ -1,6 +1,8 @@
 const sql = require('mssql');
 require('dotenv').config();
 
+console.log('DB_SERVER desde .env:', process.env.DB_SERVER);
+
 const config = {
   server: process.env.DB_SERVER, 
   database: process.env.DB_NAME, // nombre de la base datos
