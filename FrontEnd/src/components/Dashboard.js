@@ -2,7 +2,7 @@ import React from 'react';
 
 const Dashboard = () => (
   <section className="page-section active">
-    <h2>Dashboard Principal</h2>
+    <h2>Tablero Principal</h2>
     <p>Bienvenido al Sistema de Gestión de Depósito.</p>
     <div className="stats-cards">
       <div className="card">
