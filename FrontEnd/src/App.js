@@ -121,8 +121,8 @@ function App() {
         </main>
       </div>
 
-      {/* Mostrar footer solo si está logueado */}
-      {token && !isLoginPage && <Footer />}
+      {/* Footer */}
+      <Footer />
     </div>
   );
 }

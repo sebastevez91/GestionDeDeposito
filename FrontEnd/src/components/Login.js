@@ -3,7 +3,7 @@ import axios from '../Api/axios';
 import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
-  const [nombre_usuario, setNombreUsuario] = useState('');
+  const [username, setNombreUsuario] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -13,29 +13,22 @@ const Login = () => {
     setError('');
 
     try {
-      const res = await axios.post('/login', { nombre_usuario, password });
+      const res = await axios.post('/login', { username, password });
       const { token, usuario } = res.data;
 
       // Guardar token y datos del usuario en localStorage
       localStorage.setItem('token', token);
       localStorage.setItem('usuario', JSON.stringify(usuario));
-
-      // Redireccionar según el rol
-      switch (usuario.rol_id) {
-        case 1:
-          navigate('/admin/dashboard');
-          break;
-        case 2:
-          navigate('/operador/dashboard');
-          break;
-        case 3:
-          navigate('/supervisor/dashboard');
-          break;
-        default:
-          navigate('/dashboard');
+      console.log(usuario);
+      
+      if(usuario.rol.trim().toLowerCase() === "admin"){
+        navigate('/admin/dashboard');
+      }else{
+        console.log("No inicio correctamente el rol")
+        navigate('/admin/dashboard');
       }
-
     } catch (err) {
+      console.error('❌ Error en login:', err); 
       setError(err.response?.data?.error || 'Error al iniciar sesión');
     }
   };
@@ -53,7 +46,7 @@ const Login = () => {
             <label>Usuario</label>
             <input
               type="text"
-              value={nombre_usuario}
+              value={username}
               onChange={(e) => setNombreUsuario(e.target.value)}
               required
             />
