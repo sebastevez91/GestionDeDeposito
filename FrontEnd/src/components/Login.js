@@ -41,30 +41,36 @@ const Login = () => {
   };
 
   return (
-    <div className="form-box login">
-      <h2>Iniciar Sesión</h2>
-      <form onSubmit={handleLogin}>
-        <div>
-          <label>Usuario</label>
-          <input
-            type="text"
-            value={nombre_usuario}
-            onChange={(e) => setNombreUsuario(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label>Contraseña</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-        <button className="btn btn-primary" type="submit">Ingresar</button>
-      </form>
+    <div className="login-container">
+      <div className='toggle-panel toggle-left'>
+        <h1>¡Hola, Bienvenido a Deposito Teach!</h1>
+        <p>Para poder registrarte debes comunicarte con soporte</p>
+      </div>
+      <div className='login-box'>
+        <h2>Acceso a su cuenta</h2>
+        <form onSubmit={handleLogin}>
+          <div>
+            <label>Usuario</label>
+            <input
+              type="text"
+              value={nombre_usuario}
+              onChange={(e) => setNombreUsuario(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <label>Contraseña</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+          {error && <p style={{ color: 'red' }}>{error}</p>}
+          <button className="btn btn-primary" type="submit">Ingresar</button>
+        </form>        
+      </div>
     </div>
   );
 };

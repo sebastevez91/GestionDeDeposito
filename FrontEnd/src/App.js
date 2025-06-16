@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import Footer from './components/Footer';
@@ -15,19 +15,26 @@ import PrivateRoute from './utils/PrivateRoute';
 import './App.css';
 
 function App() {
-  // Mantener estados para pasar datos de edición
+  const location = useLocation();
+  const token = localStorage.getItem('token');
+
+  // Estados para edición
   const [editingProducto, setEditingProducto] = useState(null);
   const [editingUsuario, setEditingUsuario] = useState(null);
 
-  // Funciones para setear el item a editar
   const handleEditProducto = (producto) => setEditingProducto(producto);
   const handleEditUsuario = (usuario) => setEditingUsuario(usuario);
 
+  // Ver si estamos en la ruta de login
+  const isLoginPage = location.pathname === '/';
+
   return (
     <div className="app-container">
+      {/* Mostrar header y sidebar solo si está logueado */}
       <Header />
       <div className="container" style={{ display: 'flex' }}>
-        <Sidebar />
+        {token && !isLoginPage && <Sidebar />}
+
         <main className="main-content" style={{ flex: 1 }}>
           <Routes>
             <Route path="/" element={<Login />} />
@@ -109,12 +116,13 @@ function App() {
               }
             />
 
-            {/* Redireccionar rutas desconocidas */}
             <Route path="*" element={<Navigate to="/dashboard" />} />
           </Routes>
         </main>
       </div>
-      <Footer />
+
+      {/* Mostrar footer solo si está logueado */}
+      {token && !isLoginPage && <Footer />}
     </div>
   );
 }
