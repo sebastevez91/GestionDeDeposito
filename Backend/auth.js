@@ -5,11 +5,26 @@ const SECRET = process.env.JWT_SECRET || 'clave-secreta'; // 🔐 Usar JWT_SECRE
 
 function generarToken(usuario) {
   return jwt.sign(
-    { id: usuario.id, nombre_usuario: usuario.nombre_usuario },
+    {
+      id: usuario.id,
+      nombre_usuario: usuario.nombre_usuario,
+      rol_id: usuario.rol_id // 👈 Incluye el rol en el token
+    },
     SECRET,
     { expiresIn: '2h' }
   );
 }
+
+function permitirRoles(...rolesPermitidos) {
+  return (req, res, next) => {
+    const { rol_id } = req.usuario;
+    if (!rolesPermitidos.includes(rol_id)) {
+      return res.status(403).json({ error: 'Acceso denegado: rol insuficiente' });
+    }
+    next();
+  };
+}
+
 
 function verificarToken(req, res, next) {
   const token = req.headers['authorization']?.split(' ')[1];
@@ -24,4 +39,5 @@ function verificarToken(req, res, next) {
   }
 }
 
-module.exports = { generarToken, verificarToken };
+module.exports = { generarToken, verificarToken, permitirRoles };
+
