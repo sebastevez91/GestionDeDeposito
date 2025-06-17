@@ -8,6 +8,25 @@ const { generarToken } = require('./auth');
 const usuario_id = 1;
 
 //---------------------------------------------
+// DASHBOARD
+//---------------------------------------------
+router.get('/dashboard', async (req, res) => {
+  try {
+    const pool = await poolPromise;
+    const cantidadResult = await pool.request()
+      .query('SELECT COUNT(*) as cantidad FROM Producto');
+      
+    const cantidad = cantidadResult.recordset[0].cantidad;
+
+    res.json({
+      cantidad
+    });
+  } catch (error) {
+    console.error('Error en /dashboard:', error);
+    res.status(500).json({ error: 'Error al cargar la información del tablero' });
+  }
+});
+//---------------------------------------------
 // LOGIN
 //---------------------------------------------
 router.post('/login', async (req, res) => {
@@ -39,23 +58,23 @@ router.post('/login', async (req, res) => {
 // PRODUCTO
 //---------------------------------------------
 router.post('/productos', async (req, res) => {
-  const { codigo, nombre, descripcion } = req.body;
+  const { nombre, descripcion, precio } = req.body;
   try {
     const pool = await poolPromise;
     const result = await pool.request()
-      .input('codigo', sql.VarChar, codigo)
       .input('nombre', sql.VarChar, nombre)
       .input('descripcion', sql.VarChar, descripcion)
-      .query('INSERT INTO Producto (codigo, nombre, descripcion) OUTPUT INSERTED.id VALUES (@codigo, @nombre, @descripcion)');
+      .input('precio', sql.Decimal, precio )
+      .query('INSERT INTO Productos (nombre, descripcion, precio) OUTPUT INSERTED.id VALUES (@nombre, @descripcion, @precio)');
     
     const id = result.recordset[0].id;
 
     await registrarAuditoria({
-      tabla: 'Producto',
+      tabla: 'Productos',
       id_registro: id,
       accion: 'INSERT',
       usuario_id,
-      datos_nuevos: { codigo, nombre, descripcion }
+      datos_nuevos: { nombre, descripcion, precio }
     });
 
     res.status(201).json({ mensaje: 'Producto creado ✅' });

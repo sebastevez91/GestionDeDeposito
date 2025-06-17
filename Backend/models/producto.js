@@ -17,7 +17,7 @@ async function crearProducto(nombre, descripcion, precio) {
         const pool = await poolPromise;
         await pool.request()
             .input('nombre', sql.VarChar, nombre)
-            .input('description', sql.VarChar, descripcion)
+            .input('descripcion', sql.VarChar, descripcion)
             .input('precio', sql.Decimal(10, 2), precio)
             .query('INSERT INTO Productos (nombre, descripcion, precio) VALUES (@nombre, @descripcion, @precio)');
     } catch (err) {
