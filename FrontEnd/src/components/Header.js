@@ -25,7 +25,7 @@ const Header = () => {
       <h1>Sistema de Gestión de Depósito</h1>
       {usuario && (
         <div className="user-info">
-          <span id='idNameUser' >Usuario: {usuario?.username + ' ' + usuario?.rol}</span> | {' '}
+          <span id='idNameUser' >Usuario: {usuario?.username + ' / ' + usuario?.rol}</span> | {' '}
           <button onClick={handleLogout} className="btn btn-primary">
             Cerrar sesión
           </button>
