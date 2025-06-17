@@ -13,13 +13,30 @@ const usuario_id = 1;
 router.get('/dashboard', async (req, res) => {
   try {
     const pool = await poolPromise;
+
+    // Cantidad de productos
     const cantidadResult = await pool.request()
-      .query('SELECT COUNT(*) as cantidad FROM Producto');
-      
+      .query('SELECT COUNT(*) as cantidad FROM Productos');
     const cantidad = cantidadResult.recordset[0].cantidad;
 
+    // Cantidad de productos con stock bajo (< 5)
+    const stockBajoResult = await pool.request()
+      .query('SELECT COUNT(*) as stock_bajo FROM Productos WHERE stock < 5');
+    const stock_bajo = stockBajoResult.recordset[0].stock_bajo;
+
+    // Cantidad de movimientos de hoy
+    const movimientosHoyResult = await pool.request()
+      .query(`
+        SELECT COUNT(*) as movimientos_hoy
+        FROM Movimientos
+        WHERE CONVERT(date, fecha) = CONVERT(date, GETDATE())
+      `);
+    const movimientos_hoy = movimientosHoyResult.recordset[0].movimientos_hoy;
+
     res.json({
-      cantidad
+      cantidad,
+      stock_bajo,
+      movimientos_hoy
     });
   } catch (error) {
     console.error('Error en /dashboard:', error);

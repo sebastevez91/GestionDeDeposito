@@ -4,6 +4,7 @@ const cors = require('cors');
 const path = require('path');
 const { poolPromise } = require('./db'); // ✅ Adaptado para SQL Server
 const loginRouter = require('./login');
+const dashboardRouter = require('./endpoints');
 const { verificarToken } = require('./auth');
 
 const app = express();
@@ -22,6 +23,9 @@ app.use(express.static(path.join(__dirname, 'public'))); // Si usás archivos es
 app.get('/', (req, res) => {
   res.send('API de Gestión de Depósito');
 });
+
+// Ruta de dashboard
+app.use('/api', dashboardRouter);
 
 // Ruta de login
 app.use('/api', loginRouter);
@@ -44,7 +48,7 @@ app.post('/api/productos', verificarToken, async (req, res) => {
       .input('codigo', codigo)
       .input('nombre', nombre)
       .input('descripcion', descripcion)
-      .query(`INSERT INTO Producto (codigo, nombre, descripcion)
+      .query(`INSERT INTO Productos (codigo, nombre, descripcion)
               OUTPUT INSERTED.id
               VALUES (@codigo, @nombre, @descripcion)`);
 
@@ -60,7 +64,7 @@ app.post('/api/productos', verificarToken, async (req, res) => {
 
     // Auditoría
     await pool.request()
-      .input('tabla', 'Producto')
+      .input('tabla', 'Productos')
       .input('id_registro', productoId)
       .input('accion', 'INSERT')
       .input('usuario_id', usuario_id)
