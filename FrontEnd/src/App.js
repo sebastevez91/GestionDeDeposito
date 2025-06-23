@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import Footer from './components/Footer';
 import Dashboard from './components/Dashboard';
-import ProductosLista from './components/ProductoLista';
-import ProductosForm from './components/ProductoForm';
+import ProductosLista from './components/ProductosLista';
+import ProductosForm from './components/ProductosForm';
 import StockMovimiento from './components/StockMovimiento';
 import MovimientosConsulta from './components/MovimientosConsulta';
 import UsuariosLista from './components/UsuariosLista';
@@ -18,15 +18,18 @@ function App() {
   const [editingProducto, setEditingProducto] = useState(null);
   const [editingUsuario, setEditingUsuario] = useState(null);
 
+  const location = useLocation();
+  const isLoginPage = location.pathname === '/';
+
   const handleEditProducto = (producto) => setEditingProducto(producto);
   const handleEditUsuario = (usuario) => setEditingUsuario(usuario);
 
   return (
     <div className="app-container">
-      <Header />
+      {!isLoginPage && <Header />}
       <div className="container" style={{ display: 'flex' }}>
-        <Sidebar />
-        <main className="main-content" style={{ flex: 1, padding: '1rem' }}>
+        {!isLoginPage && <Sidebar />}
+        <main className="main-content" style={{ flex: 1 }}>
           <Routes>
             <Route path="/" element={<Login />} />
 
@@ -38,7 +41,6 @@ function App() {
                 </PrivateRoute>
               }
             />
-
             <Route
               path="/productos"
               element={
@@ -63,7 +65,6 @@ function App() {
                 </PrivateRoute>
               }
             />
-
             <Route
               path="/stock-movimiento"
               element={
@@ -72,7 +73,6 @@ function App() {
                 </PrivateRoute>
               }
             />
-
             <Route
               path="/movimientos-consulta"
               element={
@@ -81,7 +81,6 @@ function App() {
                 </PrivateRoute>
               }
             />
-
             <Route
               path="/usuarios"
               element={
@@ -106,13 +105,11 @@ function App() {
                 </PrivateRoute>
               }
             />
-
-            {/* Redirección para rutas desconocidas */}
             <Route path="*" element={<Navigate to="/dashboard" />} />
           </Routes>
         </main>
       </div>
-      <Footer />
+      {!isLoginPage && <Footer />}
     </div>
   );
 }

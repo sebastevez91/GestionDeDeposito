@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from '../Api/axios';
 import { useNavigate } from 'react-router-dom';
 import ProductoForm from './ProductoForm';
-import ProductosLista from './ProductoLista';
+import ProductoLista from './ProductoLista';
 
 const Dashboard = () => {
   const [productos, setProductos] = useState([]);
@@ -16,7 +16,6 @@ const Dashboard = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       setProductos(res.data);
-      setError('');
     } catch (err) {
       setError('Error al obtener productos');
     }
@@ -33,15 +32,13 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard-container">
-      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <h2>Panel de Productos</h2>
-        <button onClick={handleLogout}>Cerrar sesión</button>
-      </div>
+      <h2>Panel de Productos</h2>
+      <button onClick={handleLogout}>Cerrar sesión</button>
 
       {error && <p style={{ color: 'red' }}>{error}</p>}
 
       <ProductoForm onSuccess={fetchProductos} />
-      <ProductosLista productos={productos} onDeleteSuccess={fetchProductos} />
+      <ProductoLista productos={productos} onDeleteSuccess={fetchProductos} />
     </div>
   );
 };
